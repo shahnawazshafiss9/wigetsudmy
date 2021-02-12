@@ -28,7 +28,7 @@ const Search = () => {
             setResult(data.query.search);
         }
         search();
-    }, [debouncedTerm]);
+    }, [debouncedTerm] );
 
     // useEffect(() => {
         
