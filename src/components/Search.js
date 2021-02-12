@@ -3,8 +3,17 @@ import axios from 'axios'
 
 const Search = () => {
     const [term, setTerm] = useState('programming');
-    const [result, setResult] = useState([])
+    const [debouncedTerm, setDebouncedTerm] = useState(term);
+    const [result, setResult] = useState([]);
 
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            setDebouncedTerm(term);
+        }, 1000);
+        return () => {
+            clearTimeout(timerId);
+        };
+    }, [term]);
     useEffect(() => {
         const search = async () => {
             const { data } = await axios.get('https://en.wikipedia.org/w/api.php', {
@@ -13,24 +22,29 @@ const Search = () => {
                     list: 'search',
                     origin: '*',
                     format: 'json',
-                    srsearch: term
+                    srsearch: debouncedTerm
                 }
             });
             setResult(data.query.search);
         }
-        if (term && !result.length) {
-            search();
-        } else {
-            const settimeid = setTimeout(() => {
-                if (term) {
-                    search();
-                }
-            }, 1000);
-            return () => {
-                clearTimeout(settimeid);
-            }
-        }
-    }, [term]);
+        search();
+    }, [debouncedTerm]);
+
+    // useEffect(() => {
+        
+    //     if (term && !result.length) {
+    //         search();
+    //     } else {
+    //         const settimeid = setTimeout(() => {
+    //             if (term) {
+    //                 search();
+    //             }
+    //         }, 1000);
+    //         return () => {
+    //             clearTimeout(settimeid);
+    //         }
+    //     }
+    // }, [term, result.length]);
     const renderedResults = result.map((item) => {
         return (
             <div className="item" key={item.pageid}>
